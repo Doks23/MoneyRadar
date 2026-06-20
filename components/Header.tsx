@@ -1,5 +1,5 @@
 import React from 'react';
-import { LogoIcon, KeyIcon } from './Icons';
+import { LogoIcon, KeyIcon, SettingsIcon, ProfileIcon } from './Icons';
 
 interface HeaderProps {
     onApiKeyClick?: () => void;
@@ -18,22 +18,27 @@ export const Header: React.FC<HeaderProps> = ({ onApiKeyClick }) => {
               <h1 className="text-xl sm:text-2xl font-display font-extrabold tracking-tight text-surface-900">
                 Money<span className="text-brand-600">Radar</span>
               </h1>
-              <p className="hidden sm:block text-[10px] font-semibold uppercase tracking-[0.15em] text-surface-400 -mt-0.5">Premium Financial Intelligence</p>
+              <p className="hidden sm:block text-xs text-surface-400 -mt-0.5">Personal finance statement analyzer</p>
             </div>
           </div>
           
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center gap-1 sm:gap-2">
             {onApiKeyClick && (
                 <button 
                     onClick={onApiKeyClick}
-                    className="p-2.5 text-surface-400 hover:text-brand-600 hover:bg-brand-50 rounded-xl transition-all"
-                    title="Set API Key"
+                    className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-surface-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-all"
                 >
-                    <KeyIcon className="w-5 h-5" />
+                    <KeyIcon className="w-4 h-4" />
+                    <span className="hidden sm:inline">AI Key</span>
                 </button>
             )}
-            <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center text-white shadow-sm">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+            <button className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-surface-500 hover:text-surface-700 hover:bg-surface-100 rounded-lg transition-all">
+                <SettingsIcon className="w-4 h-4" />
+                <span className="hidden sm:inline">Settings</span>
+            </button>
+            <div className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-surface-500 hover:text-surface-700 hover:bg-surface-100 rounded-lg transition-all cursor-pointer">
+                <ProfileIcon className="w-4 h-4" />
+                <span className="hidden sm:inline">Profile</span>
             </div>
           </div>
         </div>

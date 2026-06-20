@@ -5,6 +5,7 @@ import { AnalysisSummary } from './components/AnalysisSummary';
 import { ExpenseChart } from './components/ExpenseChart';
 import { TransactionList } from './components/TransactionList';
 import { Welcome } from './components/Welcome';
+import { SampleFiles } from './components/SampleFiles';
 import { Loader } from './components/Loader';
 import { ErrorDisplay } from './components/ErrorDisplay';
 import { MonthlyExpenseChart } from './components/MonthlyExpenseChart';
@@ -658,9 +659,9 @@ export const App: React.FC = () => {
                 <>
                         {!analysisResult ? (
                             <>
-                                <FileUpload onFileUpload={handleFileUpload} disabled={isLoading} />
                                 {isLoading && <Loader progress={progress} processingFile={processingFile} />}
-                                <Welcome onImportClick={handleImportClick} />
+                                <SampleFiles onFileUpload={handleFileUpload} disabled={isLoading} />
+                                <Welcome onFileUpload={handleFileUpload} onImportClick={handleImportClick} isLoading={isLoading} />
                             </>
                         ) : (
                             <div>
@@ -676,6 +677,8 @@ export const App: React.FC = () => {
                                         {isLoading && <Loader progress={progress} processingFile={processingFile} />}
                                     </div>
                                 </details>
+
+                                <SampleFiles onFileUpload={handleFileUpload} disabled={isLoading} />
 
                                 <details className="w-full bg-white rounded-2xl shadow-card border border-surface-200 group" open>
                                     <summary className="p-4 flex justify-between items-center cursor-pointer list-none">

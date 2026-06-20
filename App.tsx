@@ -17,12 +17,13 @@ import { DashboardFilters } from './components/DashboardFilters';
 import { DuplicateTransactionModal } from './components/DuplicateTransactionModal';
 import { PasswordModal } from './components/PasswordModal';
 import { ApiKeyModal } from './components/ApiKeyModal';
+import { SetupScreen } from './components/SetupScreen';
 import { fileToBase64, readFileAsText } from './utils/fileUtils';
 import { checkAndDecryptPdf } from './utils/pdfUtils';
-import { analyzeStatement } from './services/geminiService';
+import { analyzeStatement, getLLMConfig } from './services/aiService';
 import { parseOffline } from './services/offlineParser';
 import { parseImportedTransactions } from './utils/csvUtils';
-import { AnalysisResult, CategorizationRule, FileContent, Transaction, ExpenseByCategory, MonthlyExpense, ViewType, AnalysisLogEntry } from './types';
+import { AnalysisResult, CategorizationRule, FileContent, LLMConfig, Transaction, ExpenseByCategory, MonthlyExpense, ViewType, AnalysisLogEntry } from './types';
 import { v4 as uuidv4 } from 'uuid';
 import { defaultRules } from './data/defaultRules';
 import { applyRulesToTransactions } from './utils/categorize';
@@ -64,26 +65,39 @@ export const App: React.FC = () => {
         resolve: (password: string | null) => void;
     } | null>(null);
 
+    const [isConfigured, setIsConfigured] = useState(false);
     const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
     const [isApiKeyDismissible, setIsApiKeyDismissible] = useState(true);
 
     useEffect(() => {
+        const config = getLLMConfig();
         const storedKey = localStorage.getItem('gemini_api_key');
         let envKey = '';
         try {
             envKey = process.env.GEMINI_API_KEY || process.env.API_KEY || '';
-        } catch (e) {
-            // Ignore error if process is not defined (e.g., on GitHub Pages)
-        }
+        } catch (e) {}
         
-        if (!storedKey && !envKey) {
-            setIsApiKeyDismissible(false);
-            setIsApiKeyModalOpen(true);
+        if (config) {
+            setIsConfigured(true);
+        } else if (storedKey || envKey) {
+            // Migrate legacy key to new config format
+            const migrated: LLMConfig = {
+                provider: 'google',
+                model: 'gemini-2.5-flash',
+                apiKey: storedKey || envKey,
+            };
+            localStorage.setItem('llm_config', JSON.stringify(migrated));
+            setIsConfigured(true);
         }
     }, []);
 
     const handleSaveApiKey = (key: string) => {
         localStorage.setItem('gemini_api_key', key);
+        const existing = getLLMConfig();
+        if (existing) {
+            existing.apiKey = key;
+            localStorage.setItem('llm_config', JSON.stringify(existing));
+        }
         setIsApiKeyModalOpen(false);
         setIsApiKeyDismissible(true);
     };
@@ -644,6 +658,10 @@ export const App: React.FC = () => {
                 : [...prev, category]
         );
     };
+
+    if (!isConfigured) {
+        return <SetupScreen onComplete={() => setIsConfigured(true)} />;
+    }
 
     return (
         <div className="min-h-screen bg-surface-50">
